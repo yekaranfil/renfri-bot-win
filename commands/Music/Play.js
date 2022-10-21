@@ -24,17 +24,16 @@ module.exports = {
    
       
       
-      
         if (!message.member.voice.channel) return client.sendTime(message.channel, "❌ | **Bir şeyler çalmak için bir ses kanalında olmalısınız!**");
         //else if(message.guild.me.voice && message.guild.me.voice.channel.id !== message.member.voice.channel.id)return client.sendTime(message.channel, "❌ | **You must be in same voice channel as the bot is in to play something!**");
-        if (message.guild.me.voice.channel && message.member.voice.channel.id !== message.guild.me.voice.channel.id) return client.sendTime(message.channel, `❌ | ${message.guild.me.voice.channel} **:exclamation:KANALINDA AKTİFİM LÜTFEN ORADA KULLANIN YA DA \`${GuildDB.prefix}leave\` kullanın ardından şarkıyı açın.:exclamation:**- **Bir şeyler çalmak için benimle aynı ses kanalında olmalısınız! - **`);
+        if (message.guild.me.voice.channel && message.member.voice.channel.id !== message.guild.me.voice.channel.id) return client.sendTime(message.channel, `❌ | ${message.guild.me.voice.channel} **:exclamation:KANALINDA AKTİFİM LÜTFEN ORADA KULLANIN YA DA \`${GuildDB.prefix}leave\` kullanın ardından şarkıyı açın.:exclamation:**- **Bir şeyler çalmak için benimle aynı ses kanalında olmalısınız! - *join kullanınız **`);
         let SearchString = args.join(" ");
         if (!SearchString) return client.sendTime(message.channel, `**Usage - **\`${GuildDB.prefix}play [Song Name|Song URL]\``); //et Searching = await message.channel.send("<a:YklenmeGif:821076739207069706> Aranıyor...");
         
         let CheckNode = client.Manager.nodes.get(client.config.Lavalink.id);
         let Searching = await message.channel.send("<a:CWS_GoogleAssistant:853730537192947732>  Aranıyor... <:yt:853732706202288128>");
         if (!CheckNode || !CheckNode.connected) {
-       return client.sendTime(message.channel,"❌ | **Lavalink node sunucuya bağlanamadı lütfen bunu *bugbildir ile bildirin**");
+       return client.sendTime(message.channel,"❌ | **Lavalink nodeları  <:yt:853732706202288128>  Youtube sunucusuna bağlanamadı lütfen bunu !bugbildir ile bildirin**");
           }
 
         let SongAddedEmbed = new MessageEmbed().setColor("RED");
@@ -85,14 +84,28 @@ module.exports = {
                     return client.sendTime(message.channel, "** Eşleşme bulunamadı - **" + SearchString);
                 }
             } else {
-                     if(SearchString.indexOf("&list=")!=-1){
-                    var silinenlink = SearchString.search("&list=");
-                   // var artiklink = SearchString.length - silinenlink;
-                    var sublink = SearchString.substring(0,silinenlink);
+                if(SearchString.indexOf("?list=")!=-1){
+                    if(SearchString.indexOf("youtu.be")!=-1) {
+                        var cutpoint = SearchString.indexOf("?list=");
+                        SearchString = SearchString.substring(17,cutpoint)
+                        var linkbasi = "https://www.youtube.com/watch?v="+ SearchString.toString();
+                        SearchString=linkbasi;
+                    }
+    
+                } else if (SearchString.indexOf("&list=") !=-1){
+                   
+                    if(SearchString.indexOf("&list=")!=-1){
+                        var cutpoint = SearchString.search("&list=");
+                        SearchString = SearchString.substring(0,cutpoint)
+                    }else {
+                        SearchString;
+                    }
+                
+
                 }else {
-                    sublink = SearchString;
+                    SearchString;
                 }
-                let Searched = await player.search(sublink, message.author);
+                let Searched = await player.search(SearchString, message.author);
                 if (!player) return client.sendTime(message.channel, "❌ | **Şu anda hiçbir şey oynatılmıyor ...**");
 
                 if (Searched.loadType === "NO_MATCHES") return client.sendTime(message.channel, "** Eşleşme bulunamadı - **" + SearchString);
